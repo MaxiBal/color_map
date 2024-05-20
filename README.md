@@ -1,5 +1,5 @@
 # color_map
-ROS node for displaying temperature data as a MarkerArray on a map
+ROS node for displaying temperature data as a MarkerArray
 
 ## Usage
 

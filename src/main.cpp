@@ -54,10 +54,8 @@ visualization_msgs::Marker create_marker()
 
 void combine_map(
 	const sensor_msgs::TemperaturePtr& temp,
-	const sensor_msgs::RelativeHumidityPtr& humidity,
 	const geometry_msgs::PoseStampedConstPtr& pose)
 {
-
 	float t = temp->temperature;
 
 	visualization_msgs::Marker marker = create_marker();
@@ -75,10 +73,8 @@ void combine_map(
 	) = ch.get_rgb();
 
 	markers.push_back(marker);
-
-
+	
 	visualization_msgs::MarkerArray arr;
-
 	arr.markers = markers;
 
 	color_map_publisher.publish(arr);
@@ -94,15 +90,14 @@ int main(int argc, char** argv)
 
 	color_map_publisher = nh.advertise<visualization_msgs::MarkerArray>("visualization_marker_array", 100);
 
-	// subscribe to pose, temp, and humidity
+	// subscribe to pose, temp
 
-	message_filters::Subscriber<sensor_msgs::Temperature>    	map_sub  	(nh, "temperature", 1);
-	message_filters::Subscriber<sensor_msgs::RealtiveHumidity>	humidity_sub(nh, "humidity", 1);
-	message_filters::Subscriber<geometry_msgs::PoseStamped> 	pose_sub 	(nh, "slam_out_pose", 1);
+	message_filters::Subscriber<sensor_msgs::Temperature>   temp_sub (nh, "temperature", 1);
+	message_filters::Subscriber<geometry_msgs::PoseStamped> pose_sub (nh, "slam_out_pose", 1);
 
 
 	// eventually add in the temperature reading node
-	typedef message_filters::sync_policies::ApproximateTime<nav_msgs::OccupancyGrid, geometry_msgs::PoseStamped> MapPoseSyncPolicy;
+	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Temperature, geometry_msgs::PoseStamped> MapPoseSyncPolicy;
 
 	message_filters::Synchronizer<MapPoseSyncPolicy> sync(MapPoseSyncPolicy(10), map_sub, pose_sub);
 
@@ -113,5 +108,4 @@ int main(int argc, char** argv)
 	ros::spin();
 
 	return 0;
-
 }
